@@ -1,129 +1,127 @@
-# AI-powered Job Seek Tool – A conversational agent
 
----
+# Theta Career Assistant – AI-Powered Job Search Tool
+
+## Overview
+
+**Theta Career Assistant** is an AI-powered career guidance platform that helps users analyze their resumes, match their skills with job role requirements, identify learning gaps, and generate professional networking messages. It integrates natural language models, machine learning, and real-world datasets into an interactive application designed to streamline the job search and upskilling process.
+
+This project supports **two user interfaces**:
+- **Structured (form-based) interface** to validate backend logic step-by-step.
+- **Conversational Streamlit chatbot interface** for a real-time, natural interaction experience.
+
+
+## Features
+
+- Resume PDF upload and skill extraction
+- Match against role-based required skills
+- Skill gap analysis and course recommendations from dataset
+- Predicts user's professional tier (Beginner/Intermediate/Advanced)
+- Generates cold emails and message templates using Gemini API
+- Lists recruiters, job openings, and top hiring locations
+
 
 ## Directory Structure
 
 ```
-.
-├── scripts/
-│   └── milestone1/
-│       ├── LinkedIn.ipynb
-│       ├── Coursera_details.ipynb
-│       ├── Role_based_skills.ipynb
-│       └── Chatbot_job_data.ipynb
-└── milestone2/
-│       ├── LinkedIn.ipynb
-│       ├── Coursera_details.ipynb
-│       ├── Role_based_skills.ipynb
-│       └── Chatbot_job_data.ipynb
-├── reports/
-│   └── milestone1.pdf
-    └── milestone2.pdf
-└── README.md
+cap5771sp25-project/
+│
+├── README.md                     # This file
+├── Reports/
+│   └── milestone1_report.pdf
+|   └── milestone2_report.pdf 
+|   └── milestone3_report.pdf    # Final report with methods and insights
+│
+├── Scripts/                      # Jupyter notebooks (Milestone 1 & 2 logic)
+│   ├── LinkedIn.ipynb
+│   ├── Coursera_details.ipynb
+│   ├── Role_based_skills.ipynb
+│   └── job_data.ipynb
+│
+├── Streamlit/                    # Streamlit chatbot logic (Milestone 3)
+│   └── visual.py
+│
+├── assets/
+│   ├── models/                   # Cleaned CSVs and trained models (.pkl)
+│   │   ├── Coursera
+│   │   ├── Job_descriptions
+│   │   ├── LinkedIn
+│   │   └── Roles_based_skills
+│   ├── Sample_resume.pdf         # Sample resume for testing
+│   └── Output/                   # UI output screenshots and result PDFs
 ```
+## Technologies Used
 
----
+- **Python 3.8+**
+- **Streamlit** – For building the chatbot interface
+- **Google Generative AI (Gemini)** – For skill suggestions, messaging, and course recommendations
+- **pdfplumber** – To extract text from uploaded resumes
+- **pandas**, **scikit-learn**, **joblib** – Data preprocessing and ML modeling
+- **Jupyter Notebooks** – For prototyping and data analysis
 
-## Datasets Overview
 
-Dataset drive link: https://drive.google.com/drive/folders/14zRRBGEjgJt_60Pm0WBqY4P0zPQm0_sz?usp=sharing (since this is have huge datasets, we are using google drive)
+## Datasets & Models
 
-| Dataset | Description |
-|--------|-------------|
-| **LinkedIn** | Synthetic profiles with job titles, skills, certifications, and experience. |
-| **Coursera** | Course metadata including title, rating, reviews, skills, and qualifications. |
-| **Role-Based Skills** | Job descriptions with required skills, responsibilities, and education levels. |
-| **Chatbot Job Data** | Raw scraped job listings with text fields, salary data, geolocation, and timestamps. |
+| Dataset              | Usage                                                 |
+|----------------------|-------------------------------------------------------|
+| `Coursera`           | Course titles, skills, ratings → for upskilling advice |
+| `LinkedIn`           | Simulated user profiles and recruiters → for networking |
+| `Role-Based Skills`  | Required skills by job title → for resume-role match  |
+| `Job Descriptions`   | Titles, salary, locations → for job listing insights  |
 
----
+Each dataset was cleaned and saved in `.csv` format. Corresponding ML models were trained and serialized as `.pkl` files.
 
-## Data Preprocessing
 
-Each dataset was cleaned and transformed to ensure consistency and completeness:
-- **Standardized column names**
-- **Handled missing values** via mean/mode/zero imputation
-- **Converted text fields to numeric** using parsing and regex (e.g., extracting years of experience)
-- **Cleaned skills and qualifications** from semi-structured formats
-- **Parsed salary and date columns** into machine-readable types
-- **Geolocation and temporal features** extracted from raw data (Chatbot set)
+## Model Functions
 
----
+- **Classification Models**:
+  - Predict `Experience_Binary`, `Profile_Tier`, and `Popularity_Class`
+  - Algorithms: Logistic Regression, Random Forest
 
-## Feature Engineering
+- **Regression Model**:
+  - Predicts average salary from job features
+  - Algorithm: Random Forest Regressor
 
-A wide range of engineered features were created to enrich the raw data:
+- **Resume Scoring**:
+  - Computes skill match % against job requirements
+  - Extracts matched/missing skills
+  - Calculates feature vector for profile richness
 
-| Type | Engineered Features |
-|------|---------------------|
-| **Experience** | `Experience_Years`, `Seniority_Keyword_Count`, `Responsibility_Length` |
-| **Skills & Courses** | `Skill_Count`, `Filtered_Skills`, `Skills_Encoded` |
-| **Profile/Job Enrichment** | `Profile_Richness`, `Exp_Skill_Ratio`, `Salary_Range`, `Edu_Level` |
-| **Text Features** | Word counts from descriptions, binary flags (`Has_Responsibilities`, `Has_Description`) |
-| **Temporal** | `Posting_Year`, `Posting_Month`, `Posting_Weekday` (Chatbot dataset) |
-| **Encoding** | Label Encoding and One-Hot Encoding for all relevant categorical variables |
 
----
+## How to Use
 
-## Feature Selection
+1. **Run the Chatbot**:
+   ```bash
+   streamlit run Streamlit/visual.py
+   ```
 
-To identify the most relevant predictors, we used **four complementary methods**:
-- **Random Forest Feature Importance**
-- **LASSO Regression Coefficients**
-- **Chi-Square Test Scores**
-- **Principal Component Analysis (PCA)** for dimensionality reduction
+2. **Follow the Prompts**:
+   - Enter your name, current role, and target role
+   - View required skills and hiring locations
+   - Upload your resume (PDF)
+   - Review skill match, course recommendations, and recruiter contacts
 
-> Across all datasets, features like `Experience_Years`, `Skill_Count`, and `Seniority_Keyword_Count` consistently ranked high in importance.
+3. **View Outputs**:
+   - Cold email templates
+   - Coursera courses (from dataset and Gemini)
+   - Role-based resume score
+   - Predicted career tier
 
----
 
-## Data Modeling
+## Sample Outputs
 
-We applied both **classification** and **regression** models depending on the target variable:
+- `assets/Output/normal_output.pdf` – Structured UI run
+- `assets/Output/output.pdf` – Streamlit Chatbot UI run
 
-| Task | Target | Models Used |
-|------|--------|-------------|
-| Classification | `Profile_Tier`, `Experience_Binary`, `Popularity_Class` | Logistic Regression, Random Forest, SVM |
-| Regression | `Average_Salary` | Linear Regression, Random Forest Regressor |
 
-### Key Metrics Reported:
-- **Accuracy, Precision, Recall, F1-Score (per class)**
-- **ROC AUC Scores**
-- **RMSE and R² for regression models**
-- **Confusion Matrices and ROC Curves for evaluation**
+## Final Report
 
-> In most cases, **Random Forest** models provided the best trade-off between accuracy and training time, especially under limited computational resources.
+The comprehensive summary of design, methodology, modeling, evaluation, and screenshots is provided in:  
+`Reports/milestone3_report.pdf`
 
----
 
-## Summary of Results
-
-- **Logistic Regression and Random Forest** achieved >99% accuracy for entry-level classification tasks.
-- **LASSO** confirmed sparsity in feature importance, with `Experience_Years` emerging as the strongest predictor.
-- **Random Forest Regressor** performed best for salary prediction with minimal tuning.
-- ROC-AUC analysis revealed stronger performance on clearly separable classes (e.g., "Low" popularity) and challenges with borderline cases (e.g., "Medium" tier).
-
----
-
-## Notes for Graders
-
-- Please explore each notebook in `scripts/milestone2/` to view complete Milestone 2 processing pipelines.
-- All post-preprocessing steps (feature engineering, modeling, and evaluation) are detailed and well-annotated in each notebook.
-- A compiled summary of all results, insights, and visuals is available in `reports/milestone2.pdf`.
-
----
-
-## Tools & Libraries
-
-- Python 3.8+
-- `pandas`, `numpy`, `scikit-learn`, `matplotlib`, `seaborn`
-- Optional: `notebook`, `jupyterlab`, `datasets` (Hugging Face)
-
----
-
-##  Author
+## Author
 
 **Swetha Gendlur Nagarajan**  
-University of Florida  
-M.S. Applied Data Science  
-April 2025
+Master’s in Applied Data Science  
+University of Florida, April 2025
+
