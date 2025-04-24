@@ -69,6 +69,7 @@ cap5771sp25-project/
 | `Job Descriptions`   | Titles, salary, locations → for job listing insights  |
 
 Each dataset was cleaned and saved in `.csv` format. Corresponding ML models were trained and serialized as `.pkl` files.
+Since the dataset is huge they are uploaded in the drive: https://drive.google.com/drive/folders/1gW4D2Yrc6UgwIH1PO8hqqb0_wNBTmT5F?usp=drive_link 
 
 
 ## Model Functions
