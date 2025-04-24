@@ -117,6 +117,7 @@ Each dataset was cleaned and saved in `.csv` format. Corresponding ML models wer
 
 The comprehensive summary of design, methodology, modeling, evaluation, and screenshots is provided in:  
 `Reports/milestone3_report.pdf`
+Link for PPT: https://drive.google.com/drive/u/2/folders/1Vn-mqMNqLcvMJ1ozCFwWG4FlccUSdsyj 
 
 
 ## Author
