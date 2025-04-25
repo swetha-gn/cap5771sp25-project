@@ -92,7 +92,7 @@ Since the dataset is huge they are uploaded in the drive: https://drive.google.c
 
 1. **Run the Chatbot**:
    ```bash
-   streamlit run Streamlit/visual.py
+   streamlit run Streamlit/gemini_career_chatbot.py
    ```
 
 2. **Follow the Prompts**:
@@ -118,7 +118,8 @@ Since the dataset is huge they are uploaded in the drive: https://drive.google.c
 
 The comprehensive summary of design, methodology, modeling, evaluation, and screenshots is provided in:  
 `Reports/milestone3_report.pdf`
-Link for PPT: https://drive.google.com/drive/u/2/folders/1Vn-mqMNqLcvMJ1ozCFwWG4FlccUSdsyj 
+
+Link for demo, Updated PPT: https://drive.google.com/drive/u/2/folders/1Vn-mqMNqLcvMJ1ozCFwWG4FlccUSdsyj 
 
 
 ## Author
