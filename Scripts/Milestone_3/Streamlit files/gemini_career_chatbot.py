@@ -1,3 +1,5 @@
+
+
 import streamlit as st
 import pandas as pd
 import joblib
@@ -5,25 +7,33 @@ import re
 import pdfplumber
 import google.generativeai as genai
 
-# Configure Gemini
+#  Configure Gemini 
 genai.configure(api_key="AIzaSyA3z0ROR3eBYxD1cqaJj0Jw2fTGnc83gZU")
 model = genai.GenerativeModel("models/gemini-1.5-flash")
 
-# Load Models & Data
+#  Load Models & Data 
+import joblib
 cc_model = joblib.load("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Coursera/best_course_popularity_model.pkl")
+
+import pandas as pd
 df_cc = pd.read_csv("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Coursera/cleaned_coursera_data.csv")
 
+#jd
 jdc_model = joblib.load("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Job_descriptions/random_forest_classifier.pkl")
 jdr_model = joblib.load("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Job_descriptions/random_forest_regressor.pkl")
-df_jd = pd.read_csv("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Job_descriptions/df_chatbot.csv")
+df_jd= pd.read_csv("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Job_descriptions/df_chatbot.csv")
+
+#ll
 
 ll_model = joblib.load("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Linkedin/best_profile_tier_model.pkl")
 df_ll = pd.read_csv("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Linkedin/preprocessed_linkedin_data.csv")
 
+#rs
 rs_model = joblib.load("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Roles_based_skills/best_model.joblib")
-df_rs = pd.read_csv("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Roles_based_skills/final_role_predictions.csv")
+df_rs= pd.read_csv("/Users/swethagendlurnagarajan/Desktop/cap5771sp25-project/IDS/models/Roles_based_skills/final_role_predictions.csv")
 
-# Resume Parsing Helpers
+
+#  Resume Parsing 
 SECTION_HEADERS = {'skills': ['skills', 'technical skills', 'key skills', 'technical summary', 'highlights']}
 
 def extract_text_from_pdf_bytes(file_obj):
@@ -80,9 +90,9 @@ def compute_profile_features(parsed, matched_skills):
     }])
     return df[["Experience_Years", "Skill_Count", "Cert_Count", "Seniority_Score", "Exp_Skill_Ratio"]]
 
-# Streamlit Chat UI
-st.set_page_config(page_title="Theta Career Chatbot", layout="centered")
-st.title("💬 Theta Career Assistant (Chat Style UI)")
+#  Streamlit Chat UI 
+st.set_page_config(page_title="Gemini Career Chatbot", layout="centered")
+st.title("💬 Gemini Career Assistant (Chat Style UI)")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -125,20 +135,9 @@ if prompt := st.chat_input("Type your response..."):
         if prompt.strip().lower() == "yes":
             top_locs = df_jd[df_jd['Role'].str.contains(st.session_state.user_data['desired_role'], case=False, na=False)]['Country'].value_counts().head(3)
             bot_reply("🌍 **Top Hiring Locations:**\n" + top_locs.to_frame().to_markdown())
-            st.session_state.stage = "job_summary_check"
-            bot_reply("📝 Would you like to see available job summaries for this role, including sector and salary range? (yes/no)")
-
-    elif st.session_state.stage == "job_summary_check":
-        if prompt.strip().lower() == "yes":
-            role = st.session_state.user_data['desired_role']
-            jobs = df_jd[df_jd['Role'].str.contains(role, case=False, na=False)][['Role', 'Company', 'Sector', 'Salary Starts From', 'Salary To']].dropna().head(5)
-            jobs['Salary Range'] = jobs['Salary Starts From'].astype(int).astype(str) + ' - ' + jobs['Salary To'].astype(int).astype(str)
-            jobs_display = jobs[['Role', 'Company', 'Sector', 'Salary Range']]
-            bot_reply("💼 **Available Job Listings:**\n" + jobs_display.to_markdown(index=False))
         st.session_state.stage = "skills_needed"
-
         role = st.session_state.user_data['desired_role']
-        skills = model.generate_content(f"List 10 key technical and soft skills needed for the role: {role}.").text
+        skills = model.generate_content(f"List 10 key technical and soft skills needed for the role: {role}. Pretend it was extracted from a real job dataset.").text
         bot_reply("📜 **Common Skills for This Role:**\n" + skills)
 
         if st.session_state.user_data['current_role'].lower() in ['student', 'intern'] or st.session_state.user_data['current_role'].lower() != role.lower():
@@ -183,13 +182,7 @@ if st.session_state.stage == "resume_upload":
             matched_skills = {s for s in skills if any(re.search(rf"\b{s}\b", r) for r in ref_skills)}
             missing_skills = ref_skills - matched_skills
             score = round((len(matched_skills) / len(ref_skills)) * 100, 2)
-            st.divider()
-            st.subheader("📊 Resume Evaluation Summary")
-
-            st.metric(label="Resume Match Score (%)", value=score)
-
-            bot_reply(f"✅ **Matched Skills:** {', '.join(sorted(matched_skills))}\n\n❌ **Missing Skills:** {', '.join(sorted(missing_skills))}")
-
+            bot_reply(f"📊 **Resume Score**: {score}%\n✅ Matched Skills: {', '.join(sorted(matched_skills))}\n❌ Missing Skills: {', '.join(sorted(missing_skills))}")
             feat = compute_profile_features(parsed, matched_skills)
             tier = ll_model.predict(feat.values)[0]
             bot_reply(f"🧠 **Profile Tier**: {tier}")
@@ -203,29 +196,6 @@ if st.session_state.stage == "resume_upload":
                 job_row = df_jd[df_jd['Role'].str.contains(role, case=False, na=False)].iloc[0]
                 msg = model.generate_content(f"{st.session_state.user_data['name']} is applying for the role of {job_row['Job Title']} at {job_row['Company']}. They have matching skills: {', '.join(matched_skills)}. Write a professional referral request email.").text
                 bot_reply("📨 **Referral Email Template:**\n" + msg)
-            pros = df_ll[df_ll['Current_Role'].str.contains(role.split()[0], case=False, na=False)][['Full_Name', 'Current_Role', 'Skills', 'Certifications', 'Experience_Years', 'Contact_mail']].dropna().head(3)
-
+            pros = df_ll[df_ll['Current_Role'].str.contains(role.split()[0], case=False, na=False)][['Full_Name', 'Contact_mail']].dropna().head(3)
             bot_reply("👥 **Professionals in This Field:**\n" + pros.to_markdown(index=False))
-            msg = model.generate_content(f"{st.session_state.user_data['name']} is new to the {role} field. Suggest a short message asking professionals for guidance.").text
-            bot_reply("📨 Message Template to Seek Guidance:" + msg)
         st.session_state.stage = "done"
-        # General Career Insights
-        st.divider()
-        st.subheader("🌟 General Career Insights from Our Dataset")
-
-        # Top Roles
-        top_roles = df_jd['Role'].value_counts().head(3)
-        st.write("**Top 3 In-Demand Roles:**")
-        st.markdown("".join([f"- {role}" for role in top_roles.index]))
-
-        # Top Skills
-        top_skills = df_cc['Skills'].str.split(',').explode().str.strip().value_counts().head(3)
-        st.write("**Top 3 In-Demand Skills:**")
-        st.markdown("".join([f"- {skill}" for skill in top_skills.index]))
-
-        # Average Salary if available
-        if 'Salary Starts From' in df_jd.columns and 'Salary To' in df_jd.columns:
-            avg_salary_start = df_jd['Salary Starts From'].dropna().astype(float).mean()
-            avg_salary_to = df_jd['Salary To'].dropna().astype(float).mean()
-            st.metric(label="💰 Average Salary Range", value=f"${avg_salary_start:,.0f} - ${avg_salary_to:,.0f}")
-
